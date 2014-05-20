@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Chrome OBD-2</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+<div id="container">
+    <div id="window_titlebar">
+        <nav>
+            <ul>
+                <li><a href="#" id="connection" class="opensection">Connection</a></li>
+                <li><a href="#" id="metrics" class="opensection">Metrics</a></li>
+                <li><a href="#" id="graphs" class="opensection">Graphs</a></li>
+            </ul>
+        </nav>
+        <div id="window_titlebar_left">
+            <div class="icon-button" id="window-minimize"></div>
+            <div class="icon-button" id="window-maximize"></div>
+            <div class="icon-button" id="window-close"></div>
+        </div>
+    </div>
+    <div id="window_body">
+        <section id="section-connection">
+            <div id="messageContainer"></div>
+            <div class="panel-left">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <form role="form">
+                            <div class="form-group">
+                                <label for="serialport">ELM327 connection port</label>
+                                <select class="form-control" id="serialport">
+                                    <option>/dev/ttyUSB0</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="baudrate">Serial port baudrate</label>
+                                <select class="form-control" id="baudrate">
+                                    <option>4800</option>
+                                    <option>9600</option>
+                                    <option>19200</option>
+                                    <option selected>38400</option>
+                                    <option>57600</option>
+                                    <option>115200</option>
+                                </select>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="crlf"> Use full CRLF in initialisation
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-default" id="connectbutton">Connect</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-right">
+                <div class="panel panel-default">
+
+                    <table class="table table-striped">
+                        <tr>
+                            <th>ELM version</th>
+                            <td id="elmVersion">unknown</td>
+                        </tr>
+                        <tr>
+                            <th>Input voltage</th>
+                            <td id="elmVoltage">unknown</td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+            <br style="clear: both;">
+
+            <div class="panel panel-default">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Available</th>
+                        <th>Name</th>
+                    </tr>
+                    </thead>
+                    <tbody id="mode1support">
+
+                    </tbody>
+                </table>
+
+            </div>
+        </section>
+        <section id="section-metrics" style="display: none;">
+            <div class="gauge" id="gauge-rpm"></div>
+            <div class="gauge" id="gauge-pedal"></div>
+            <div class="gauge" id="gauge-speed"></div>
+            <div class="gauge" id="gauge-temp"></div>
+        </section>
+        <section id="section-graphs" style="display: none;">
+
+        </section>
+    </div>
+</div>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/raphael.2.1.0.min.js"></script>
+<script src="js/justgage.1.0.1.min.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/window.js"></script>
+<script src="js/gauges.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

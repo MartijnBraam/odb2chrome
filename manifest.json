@@ -1,0 +1,25 @@
+{
+    "name": "odb2chrome",
+    "version": "1.0",
+    "manifest_version": 2,
+    "minimum_chrome_version": "23",
+    "description": "Use an ELM327 bluetooth adapter on your chromebook",
+
+    "app": {
+        "background": {
+            "scripts": [ "background.js" ]
+        }
+    },
+
+    "icons": {
+        "16": "icon/16.png",
+        "48": "icon/48.png",
+        "128": "icon/128.png"
+    },
+
+    "permissions": [
+        "serial",
+        "storage",
+        "geolocation"
+    ]
+}
