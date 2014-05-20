@@ -147,7 +147,7 @@ function onResponse(lines){
             }
             console.log(data);
             state = "engineTemp";
-            writeSerial("0105\r"); //request engine temp
+            writeSerial("0105 1\r"); //request engine temp
             break;
         case "engineTemp":
             console.log('engineTempCase');
@@ -156,21 +156,28 @@ function onResponse(lines){
             console.log({'temp': engineTemp, 'tempData': tempData});
             gauges.update('gauge-temp', engineTemp);
             state = "engineRPM";
-            writeSerial("010C\r");
+            writeSerial("010C 1\r");
             break;
         case "engineRPM":
             var rpmData = parseObdResponse(lines);
             var engineRPM = ((rpmData[0] * 256) + rpmData[1]) / 4;
             gauges.update('gauge-rpm', engineRPM);
+            state = "throttlePosition";
+            writeSerial("0111 1\r");
+            break;
+        case "throttlePosition":
+            var posData = parseObdResponse(lines);
+            var pos = posData[0]*100/255;
+            gauges.update('gauge-pedal', pos);
             state = "verhicleSpeed";
-            writeSerial("010D\r");
+            writeSerial("010D 1\r");
             break;
         case "verhicleSpeed":
             var speedData = parseObdResponse(lines);
             var speed = speedData[0];
             gauges.update('gauge-speed', speed);
             state = "engineTemp";
-            writeSerial("0105\r");
+            writeSerial("0105 1\r");
             break;
     }
 }
@@ -294,8 +301,8 @@ $(function(){
     });
 
     gauges = new Gauges();
-    gauges.add("gauge-rpm",0,8000,"RPM", "rpm");
+    gauges.add("gauge-rpm",0,7000,"RPM", "rpm");
     gauges.add("gauge-pedal",0,100,"Pedal position", "%");
-    gauges.add("gauge-speed",0,200,"Speed", "km/h");
-    gauges.add("gauge-temp",0,180,"Coolant temperature", "&deg;C");
+    gauges.add("gauge-speed",0,255,"Speed", "km/h");
+    gauges.add("gauge-temp",-40,215,"Coolant temperature", "&deg;C");
 });
