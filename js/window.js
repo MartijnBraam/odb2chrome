@@ -16,14 +16,4 @@ $(function () {
             $('#window-maximize').attr('title', chrome.i18n.getMessage('restoreButton'));
         }
     });
-
-
-    $(".opensection").click(function () {
-        openSection($(this).attr("id"));
-        return false;
-    });
 });
-function openSection(id) {
-    $("section").css("display", "none");
-    $("#section-" + id).css("display", "block");
-}
