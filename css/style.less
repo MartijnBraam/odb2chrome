@@ -1,9 +1,17 @@
+@import "../bower_components/roboto-fontface/roboto-fontface";
 @import "../bower_components/bootstrap/less/bootstrap";
+@import "material";
 @import "window";
+@roboto-font-path: "../bower_components/roboto-fontface/fonts";
 
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, "Open Sans", sans-serif;
-  font-size: 13px;
-  overflow: hidden;
+@font-family-sans-serif: roboto;
+@text-color: rgba(0,0,0,0.7);
+
+.panel-paper {
+  background: white;
+  border-radius: 2px;
+  box-sizing: border-box;
+  margin: 8px;
+  padding: 8px;
+  box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
-

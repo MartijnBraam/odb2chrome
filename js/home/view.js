@@ -10,5 +10,14 @@ angular.module('app.home', ['ngRoute'])
   }])
 
   .controller('home', function ($scope, $http) {
+    $scope.serialPorts = [];
+
+    $scope.refreshPorts = function(){
+      chrome.serial.getDevices(function(ports) {
+        $scope.serialPorts = ports;
+      });
+    };
+
+    $scope.refreshPorts();
 
   });

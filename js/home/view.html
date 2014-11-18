@@ -1,1 +1,8 @@
-hai
+<div class="panel panel-paper">
+    <div class="panel-heading">Connection</div>
+    <div class="panel-body">
+        <select ng-model="serialPort" class="form-control">
+            <option ng-repeat="port in serialPorts">{{ port.path }}</option>
+        </select>
+    </div>
+</div>
