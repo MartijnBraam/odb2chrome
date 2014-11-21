@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="app">
+<html ng-app="app" ng-csp>
 <head lang="en">
     <meta charset="UTF-8">
     <title>Chrome OBD-2</title>
@@ -10,9 +10,9 @@
     <div id="window_titlebar">
         <nav>
             <ul>
-                <li><a href="#" id="connection" class="opensection">Connection</a></li>
-                <li><a href="#" id="metrics" class="opensection">Metrics</a></li>
-                <li><a href="#" id="graphs" class="opensection">Graphs</a></li>
+                <li><a href="#/">Connection</a></li>
+                <li><a href="#/metrics">Metrics</a></li>
+                <li><a href="#/diagnostics">Diagnostics</a></li>
             </ul>
         </nav>
         <div id="window_titlebar_left">
@@ -34,6 +34,7 @@
 <script src="bower_components/angular-route/angular-route.js"></script>
 
 <script src="js/app.js"></script>
+<script src="js/serialport-service.js"></script>
 <script src="js/home/view.js"></script>
 </body>
 </html>

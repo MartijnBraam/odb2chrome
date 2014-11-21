@@ -9,15 +9,24 @@ angular.module('app.home', ['ngRoute'])
     });
   }])
 
-  .controller('home', function ($scope, $http) {
+  .controller('home', function ($scope, serialPort) {
     $scope.serialPorts = [];
+    $scope.serialPortsRefreshing = false;
+    $scope.serialPort = serialPort.config;
 
     $scope.refreshPorts = function(){
+      $scope.serialPortsRefreshing = true;
       chrome.serial.getDevices(function(ports) {
         $scope.serialPorts = ports;
+        $scope.serialPortsRefreshing = false;
+        $scope.$apply();
       });
     };
 
     $scope.refreshPorts();
+
+    $scope.connect = function(){
+
+    }
 
   });

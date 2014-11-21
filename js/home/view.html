@@ -1,8 +1,32 @@
 <div class="panel panel-paper">
     <div class="panel-heading">Connection</div>
     <div class="panel-body">
-        <select ng-model="serialPort" class="form-control">
-            <option ng-repeat="port in serialPorts">{{ port.path }}</option>
-        </select>
+        <div class="row">
+            <div class="col-xs-6">
+                <label for="serialport">ELM327 connection port</label>
+                <select ng-model="serialPort.port" id="serialport" class="form-control" ng-disabled="serialPortsRefreshing">
+                    <option ng-repeat="port in serialPorts">{{ port.path }}</option>
+                </select>
+            </div>
+            <div class="col-xs-6">
+                <label for="baudrate">Serial port baudrate</label>
+                <select class="form-control" id="baudrate" ng-model="serialPort.baudrate">
+                    <option>4800</option>
+                    <option>9600</option>
+                    <option>19200</option>
+                    <option selected>38400</option>
+                    <option>57600</option>
+                    <option>115200</option>
+                </select>
+            </div>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="crlf" ng-model="serialPort.crlf"> Use full CRLF in initialisation
+            </label>
+        </div>
+        <button type="button" class="btn btn-default pull-right" ng-click="connect()">
+            Connect
+        </button>
     </div>
 </div>

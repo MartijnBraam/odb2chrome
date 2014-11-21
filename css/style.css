@@ -6414,7 +6414,7 @@ nav ul li a {
   text-decoration: none;
   color: white !important;
   font-weight: medium;
-  font-size: 20sp;
+  font-size: 15px;
 }
 nav ul li a:hover {
   border: 1px solid rgba(0, 0, 0, 0.16);
@@ -6484,4 +6484,12 @@ nav ul li a:hover {
   margin: 8px;
   padding: 8px;
   box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+}
+.panel-paper .panel-heading {
+  font-weight: 500 !important;
+  font-size: 15px !important;
+}
+.panel-paper .panel-body label {
+  font-size: 14px;
+  font-weight: normal;
 }
