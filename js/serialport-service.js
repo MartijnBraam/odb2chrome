@@ -47,7 +47,7 @@ angular.module('app.serialport', [])
         console.log("connected");
         chrome.serial.onReceive.addListener(scope._onReceive);
 
-        if (crlfinit) {
+        if (scope.config.crlf) {
           scope.write("ATZ\r\n");
         } else {
           scope.write("ATZ\r");
