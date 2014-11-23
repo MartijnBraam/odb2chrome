@@ -45,7 +45,20 @@ angular.module('app.serialport', [])
         scope.state.state = 'connected';
         scope.state.connectionId = connectionInfo.connectionId;
         console.log("connected");
-        chrome.serial.onReceive.addListener(scope._onReceive);
+        chrome.serial.onReceive.addListener(
+          function (info) {
+            console.log("_onReceive", info);
+            var char = scope._convertArrayBufferToString(info.data);
+            if (char.length > 1) {
+              var chars = char.split('');
+              for (var i = 0; i < chars.length; i++) {
+                onReceiveChar(chars[i]);
+              }
+            } else {
+              onReceiveChar(char);
+            }
+          }
+        );
 
         if (scope.config.crlf) {
           scope.write("ATZ\r\n");
@@ -56,23 +69,11 @@ angular.module('app.serialport', [])
     };
 
     this.write = function (str) {
-      console.log("write", str);
-      chrome.serial.send(this.config.connectionId, this._convertStringToArrayBuffer(str), function () {
+      console.log("write", str, "to connection", this.state.connectionId);
+      chrome.serial.send(this.state.connectionId, this._convertStringToArrayBuffer(str), function () {
       });
     };
 
-    this._onReceive = function (info) {
-      console.log("_onReceive", info);
-      var char = this._convertArrayBufferToString(info.data);
-      if (char.length > 1) {
-        var chars = char.split('');
-        for (var i = 0; i < chars.length; i++) {
-          onReceiveChar(chars[i]);
-        }
-      } else {
-        onReceiveChar(char);
-      }
-    };
     this.lines = [];
     this.readBuffer = "";
     this._onReceiveChar = function (char) {
