@@ -47,15 +47,14 @@ angular.module('app.serialport', [])
         console.log("connected");
         chrome.serial.onReceive.addListener(
           function (info) {
-            console.log("_onReceive", info);
             var char = scope._convertArrayBufferToString(info.data);
             if (char.length > 1) {
               var chars = char.split('');
               for (var i = 0; i < chars.length; i++) {
-                onReceiveChar(chars[i]);
+                scope._onReceiveChar(chars[i]);
               }
             } else {
-              onReceiveChar(char);
+              scope._onReceiveChar(char);
             }
           }
         );
@@ -79,11 +78,11 @@ angular.module('app.serialport', [])
     this._onReceiveChar = function (char) {
       if (char == "\r") {
         if (this.readBuffer !== "") {
-          this.lines.push(readBuffer);
+          this.lines.push(this.readBuffer.trim());
           this.readBuffer = "";
         }
       } else if (char == ">") {
-        this._onResponse(lines);
+        this._onResponse(this.lines);
         this.lines = [];
         this.readBuffer = "";
       } else {
