@@ -9,7 +9,9 @@ angular.module('app.serialport', [])
     };
     this.state = {
       state: 'disconnected',
-      connectionId: -1
+      connectionId: -1,
+      initPhase: 1,
+      elmVersion: ""
     };
 
     this._convertStringToArrayBuffer = function (str) {
@@ -114,6 +116,54 @@ angular.module('app.serialport', [])
 
     this._onResponse = function (lines) {
       console.log("_onResponse", lines);
+      if (this.state.initPhase > 0) {
+        switch (this.state.initPhase) {
+          case 1:
+            // Reset response received, set echo
+            if (this.config.crlf) {
+              this.write("ATE0\r\n");
+            } else {
+              this.write("ATE0\r");
+            }
+            this.state.initPhase = 2;
+            break;
+          case 2:
+            // Echo is now disabled
+            if (this.config.crlf) {
+              // Disable CRLF
+              this.state.initPhase = 3;
+              this.write("ATL0\r\n");
+            } else {
+              // CRLF already disabled on this device, request version
+              this.state.initPhase = 4;
+              this.write("ATI\r");
+            }
+            break;
+          case 3:
+            // CRLF is now disabled, request version
+            this.state.initPhase = 4;
+            this.write("ATI\r");
+            break;
+          case 4:
+            // Version response
+            this.state.elmVersion = lines[0];
+            // Request OBDII bus autoconfig
+            this.state.initPhase = 5;
+            this.write("ATSP0\r");
+            break;
+          case 5:
+            /*
+             The OBDII bus is now set up in the ELM327 chip (if the ECU in the car works)
+             This is the end of the ELM327 init, bootstrap the next phase: Capability detection
+             */
+            console.log("ELM327 init complete.");
+            this.state.initPhase = 0;
+            this.write("0100\r"); // OBDII command 01 00 (Get Mode 01 support)
+            break;
+        }
+      }else{
+
+      }
     };
 
     return this;
