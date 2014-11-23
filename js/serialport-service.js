@@ -94,23 +94,32 @@ angular.module('app.serialport', [])
 
     this._parseObdResponse = function (data) {
       var ret = [];
+      var responseId = [];
       data.forEach(function (response) {
         if (response != '>') {
           var part = response.split(" ");
-          part.splice(0, 2);
+          responseId = part.splice(0, 2);
           ret = ret.concat(part);
         }
       });
+      for (var i = 0; i < responseId.length; i++) {
+        responseId[i] = parseInt("0x" + responseId[i], 16);
+      }
       for (var i = 0; i < ret.length; i++) {
         ret[i] = parseInt("0x" + ret[i], 16);
       }
-      return ret;
+      responseId[0] -= 64; // Remove response id offset
+      return {
+        id: responseId,
+        data: ret
+      };
     };
 
     this._queue = [];
 
     this._callbacks = {
-      "01.00": function (data) {
+      "1.0": function (data) {
+        console.log("WORKING!");
       }
     };
 
@@ -162,6 +171,31 @@ angular.module('app.serialport', [])
             break;
         }
       }else{
+        // Remove useless status information
+        if(lines[0].indexOf("SEARCHING")>-1){
+          lines.shift();
+        }
+
+        // Check for connection issue
+        if(lines[0].indexOf("UNABLE TO CONNECT")>-1){
+          this.state.state='ECU Error';
+        }else{
+          // Parse the OBDII response to useful data
+          var obd2Response = this._parseObdResponse(lines);
+          var callbackName = obd2Response.id.join(".");
+          console.log("OBDII Response:", callbackName, obd2Response.data);
+
+          // Call the callback for this response id;
+          this._callbacks[callbackName](obd2Response);
+
+          // Write next command in queue
+          if(this._queue.length > 0){
+            this.write(this._queue.shift());
+          }else{
+            console.log("queue empty!");
+          }
+        }
+
 
       }
     };
