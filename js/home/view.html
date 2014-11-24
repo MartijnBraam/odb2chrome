@@ -34,6 +34,10 @@
     <div class="panel-heading">Sensor availability</div>
     <div class="panel-body">
         <table class="table table-striped">
+            <tr>
+                <th>Available</th>
+                <th>Name</th>
+            </tr>
             <tr ng-repeat="pid in elm327.pids">
                 <td>{{ pid.available }}</td>
                 <td>{{ pid.name }}</td>
