@@ -121,6 +121,17 @@ angular.module('app.serialport', [])
     this._callbacks = {
       "1.0": function (response) {
         this._parseMode1SupportPage(0, response.data);
+        if (this.pids["20"].available) {
+          this.state.state = 'Fetching sensor support page 2';
+          $rootScope.$apply();
+          this._queue.push("0120\r");
+        } else {
+          this.state.state = 'Connected';
+          $rootScope.$apply();
+        }
+      },
+      "1.20": function (response) {
+        this._parseMode1SupportPage(1, response.data);
       }
     };
 
@@ -226,6 +237,7 @@ angular.module('app.serialport', [])
     };
 
     this.pids = {
+      // Page 1
       '01': {'available': false, byte: 0, bit: 8, 'name': 'Monitor status since DTCs cleared'},
       '02': {'available': false, byte: 0, bit: 7, 'name': 'Freeze DTC'},
       '03': {'available': false, byte: 0, bit: 6, 'name': 'Fuel system status'},
@@ -260,7 +272,44 @@ angular.module('app.serialport', [])
       '1D': {'available': false, byte: 3, bit: 4, 'name': 'Oxygen sensors present'},
       '1E': {'available': false, byte: 3, bit: 3, 'name': 'Auxiliary input status'},
       '1F': {'available': false, byte: 3, bit: 2, 'name': 'Run time since engine start'},
-      '20': {'available': false, byte: 3, bit: 1, 'name': 'PIDs supported [21 - 40]'}
+      '20': {'available': false, byte: 3, bit: 1, 'name': 'PIDs supported [21 - 40]'},
+
+      // Page 2
+      '21': {'available': false, byte: 0, bit: 8, 'name': 'Distance traveled with malfunction indicator lamp (MIL) on'},
+      '22': {'available': false, byte: 0, bit: 7, 'name': 'Fuel Rail Pressure (relative to manifold vacuum)'},
+      '23': {'available': false, byte: 0, bit: 6, 'name': 'Fuel Rail Pressure (diesel, or gasoline direct inject)'},
+      '24': {'available': false, byte: 0, bit: 5, 'name': 'O2S1_WR_lambda(1): Voltage'},
+      '25': {'available': false, byte: 0, bit: 4, 'name': 'O2S2_WR_lambda(1): Voltage'},
+      '26': {'available': false, byte: 0, bit: 3, 'name': 'O2S3_WR_lambda(1): Voltage'},
+      '27': {'available': false, byte: 0, bit: 2, 'name': 'O2S4_WR_lambda(1): Voltage'},
+      '28': {'available': false, byte: 0, bit: 1, 'name': 'O2S5_WR_lambda(1): Voltage'},
+
+      '29': {'available': false, byte: 1, bit: 8, 'name': 'O2S6_WR_lambda(1): Voltage'},
+      '2A': {'available': false, byte: 1, bit: 7, 'name': 'O2S7_WR_lambda(1): Voltage'},
+      '2B': {'available': false, byte: 1, bit: 6, 'name': 'O2S8_WR_lambda(1): Voltage'},
+      '2C': {'available': false, byte: 1, bit: 5, 'name': 'Commanded EGR'},
+      '2D': {'available': false, byte: 1, bit: 4, 'name': 'EGR Error'},
+      '2E': {'available': false, byte: 1, bit: 3, 'name': 'Commanded evaporative purge'},
+      '2F': {'available': false, byte: 1, bit: 2, 'name': 'Fuel Level Input'},
+      '30': {'available': false, byte: 1, bit: 1, 'name': 'number of warm-ups since codes cleared'},
+
+      '31': {'available': false, byte: 2, bit: 8, 'name': 'Distance traveled since codes cleared'},
+      '32': {'available': false, byte: 2, bit: 7, 'name': 'Evap. System Vapor Pressure'},
+      '33': {'available': false, byte: 2, bit: 6, 'name': 'Barometric pressure'},
+      '34': {'available': false, byte: 2, bit: 5, 'name': 'O2S1_WR_lambda(1): Current'},
+      '35': {'available': false, byte: 2, bit: 4, 'name': 'O2S2_WR_lambda(1): Current'},
+      '36': {'available': false, byte: 2, bit: 3, 'name': 'O2S3_WR_lambda(1): Current'},
+      '37': {'available': false, byte: 2, bit: 2, 'name': 'O2S4_WR_lambda(1): Current'},
+      '38': {'available': false, byte: 2, bit: 1, 'name': 'O2S5_WR_lambda(1): Current'},
+
+      '39': {'available': false, byte: 3, bit: 8, 'name': 'O2S6_WR_lambda(1): Current'},
+      '3A': {'available': false, byte: 3, bit: 7, 'name': 'O2S7_WR_lambda(1): Current'},
+      '3B': {'available': false, byte: 3, bit: 6, 'name': 'O2S8_WR_lambda(1): Current'},
+      '3C': {'available': false, byte: 3, bit: 5, 'name': 'Catalyst Temperature: Bank 1, Sensor 1'},
+      '3D': {'available': false, byte: 3, bit: 4, 'name': 'Catalyst Temperature: Bank 2, Sensor 1'},
+      '3E': {'available': false, byte: 3, bit: 3, 'name': 'Catalyst Temperature: Bank 1, Sensor 2'},
+      '3F': {'available': false, byte: 3, bit: 2, 'name': 'Catalyst Temperature: Bank 2, Sensor 2'},
+      '40': {'available': false, byte: 3, bit: 1, 'name': 'PIDs supported [21 - 40]'}
     };
 
     return this;
