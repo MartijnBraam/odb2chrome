@@ -1,5 +1,5 @@
 <div class="panel panel-paper">
-    <div class="panel-heading">Connection</div>
+    <div class="panel-heading">Connection ({{ elm327.state.state }})</div>
     <div class="panel-body">
         <div class="row">
             <div class="col-xs-6">
@@ -28,5 +28,16 @@
         <button type="button" class="btn btn-default pull-right" ng-click="connect()">
             Connect
         </button>
+    </div>
+</div>
+<div class="panel panel-paper">
+    <div class="panel-heading">Sensor availability</div>
+    <div class="panel-body">
+        <table class="table table-striped">
+            <tr ng-repeat="pid in elm327.pids">
+                <td>{{ pid.available }}</td>
+                <td>{{ pid.name }}</td>
+            </tr>
+        </table>
     </div>
 </div>

@@ -12,7 +12,7 @@ angular.module('app.home', ['ngRoute'])
   .controller('home', function ($scope, elm327) {
     $scope.serialPorts = [];
     $scope.serialPortsRefreshing = false;
-    $scope.elm327 = elm327.config;
+    $scope.elm327 = elm327;
 
     $scope.refreshPorts = function(){
       $scope.serialPortsRefreshing = true;
@@ -27,7 +27,7 @@ angular.module('app.home', ['ngRoute'])
 
     $scope.refreshPorts();
     $scope.connect = function(){
-      $scope.elm327.port = "/dev/ttyUSB0";
+      $scope.elm327.config.port = "/dev/ttyUSB0";
       elm327.connect();
     }
 

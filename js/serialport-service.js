@@ -44,9 +44,10 @@ angular.module('app.serialport', [])
           console.log('connection failed');
           return;
         }
-        scope.state.state = 'connected';
+        scope.state.state = 'resetting ELM327';
+        $rootScope.$apply();
         scope.state.connectionId = connectionInfo.connectionId;
-        console.log("connected");
+        console.log("initializing");
         chrome.serial.onReceive.addListener(
           function (info) {
             var char = scope._convertArrayBufferToString(info.data);
@@ -132,6 +133,7 @@ angular.module('app.serialport', [])
           }
         }
       }
+      $rootScope.$apply();
     };
 
     this._onResponse = function (lines) {
@@ -140,6 +142,8 @@ angular.module('app.serialport', [])
         switch (this.state.initPhase) {
           case 1:
             // Reset response received, set echo
+            this.state.state = 'disabling echo';
+            $rootScope.$apply();
             if (this.config.crlf) {
               this.write("ATE0\r\n");
             } else {
@@ -151,10 +155,14 @@ angular.module('app.serialport', [])
             // Echo is now disabled
             if (this.config.crlf) {
               // Disable CRLF
+              this.state.state = 'disabling crlf';
+              $rootScope.$apply();
               this.state.initPhase = 3;
               this.write("ATL0\r\n");
             } else {
               // CRLF already disabled on this device, request version
+              this.state.state = 'requesting ELM327 version';
+              $rootScope.$apply();
               this.state.initPhase = 4;
               this.write("ATI\r");
             }
@@ -162,12 +170,16 @@ angular.module('app.serialport', [])
           case 3:
             // CRLF is now disabled, request version
             this.state.initPhase = 4;
+            this.state.state = 'requesting ELM327 version';
+            $rootScope.$apply();
             this.write("ATI\r");
             break;
           case 4:
             // Version response
             this.state.elmVersion = lines[0];
             // Request OBDII bus autoconfig
+            this.state.state = 'Set ELM327 bus to autodetect';
+            $rootScope.$apply();
             this.state.initPhase = 5;
             this.write("ATSP0\r");
             break;
@@ -177,6 +189,8 @@ angular.module('app.serialport', [])
              This is the end of the ELM327 init, bootstrap the next phase: Capability detection
              */
             console.log("ELM327 init complete.");
+            this.state.state = 'Fetching sensor support page 1';
+            $rootScope.$apply();
             this.state.initPhase = 0;
             this.write("0100\r"); // OBDII command 01 00 (Get Mode 01 support)
             break;
