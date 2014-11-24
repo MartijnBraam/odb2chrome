@@ -1,0 +1,25 @@
+{
+  "name": "odb2chrome",
+  "version": "0.0.0",
+  "homepage": "https://github.com/MartijnBraam/odb2chrome",
+  "authors": [
+    "Martijn Braam <martijn@brixit.nl>"
+  ],
+  "description": "ODB2 interface in chrome and chromeOS using a ELM327 compatible adapter",
+  "main": "background.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.1",
+    "angularjs": "~1.3.3",
+    "roboto-fontface": "~0.2.5",
+    "angular-ui-router": "~0.2.13",
+    "d3": "~3.4.13"
+  }
+}

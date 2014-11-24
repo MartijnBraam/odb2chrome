@@ -1,0 +1,61 @@
+<div class="panel panel-paper">
+    <div class="panel-heading">Connection ({{ elm327.state.state }})</div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-6">
+                <label for="serialport">ELM327 connection port</label>
+                <select ng-model="serialPort.port" id="serialport" class="form-control"
+                        ng-disabled="serialPortsRefreshing">
+                    <option ng-repeat="port in serialPorts">{{ port.path }}</option>
+                </select>
+            </div>
+            <div class="col-xs-6">
+                <label for="baudrate">Serial port baudrate</label>
+                <select class="form-control" id="baudrate" ng-model="serialPort.baudrate">
+                    <option>4800</option>
+                    <option>9600</option>
+                    <option>19200</option>
+                    <option selected>38400</option>
+                    <option>57600</option>
+                    <option>115200</option>
+                </select>
+            </div>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="crlf" ng-model="serialPort.crlf"> Use full CRLF in initialisation
+            </label>
+        </div>
+        <button type="button" class="btn btn-default pull-right" ng-click="connect()">
+            Connect
+        </button>
+    </div>
+</div>
+<div class="panel panel-paper">
+    <div class="panel-heading">Sensor availability</div>
+    <div class="panel-body">
+        <label class="pull-left">
+            <input type="checkbox" id="hidesensors" ng-model="hideUnavailableSensors"> Hide unavailable sensors
+        </label>
+        <button type="button" ng-click="checkAll()" class="btn btn-default pull-right">Check all available once</button>
+        <br><br>
+        <table class="table table-striped">
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+                <th>Unit</th>
+                <th>Available</th>
+                <th>Enabled</th>
+            </tr>
+            <tr ng-repeat="(id, pid) in elm327.pids" ng-hide="!pid.available && hideUnavailableSensors">
+                <td>{{ pid.name }}</td>
+                <td>{{ pid.value }}</td>
+                <td>{{ pid.unit }}</td>
+                <td>{{ pid.available }}</td>
+                <td>
+                    <input type="checkbox" ng-model="pid.enabled" ng-show="pid.available" ng-click="bootstrapEnable(id)">
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
