@@ -248,11 +248,25 @@ angular.module('app.serialport', [])
             this.write(this._queue.shift());
           } else {
             console.log("queue empty!");
-            this.write("0104\r");
+            var scope = this;
+            setTimeout(function () {
+              scope._checkQueue.call(scope);
+            }, 100);
           }
         }
 
 
+      }
+    };
+
+    this._checkQueue = function () {
+      if (this._queue.length > 0) {
+        this.write(this._queue.shift());
+      } else {
+        var scope = this;
+        setTimeout(function () {
+          scope._checkQueue.call(scope);
+        }, 100);
       }
     };
 
