@@ -144,7 +144,60 @@ angular.module('app.serialport', [])
           this.pids[pid].value = response.data;
         }
         $rootScope.$apply();
+      },
+      "3.1": function (response) {
+        this.dtcs = [];
+        response.data.shift();
+        var count = response.data.length / 2;
+        for (var i = 0; i < count; i++) {
+          var dtc = response.data.slice(i * 2, i * 2 + 2);
+          this._parseDTC(dtc);
+        }
+        $rootScope.$apply();
       }
+    };
+
+    this._parseDTC = function (byte) {
+      var dtc = "";
+      var first = (byte[0] & 128) + (byte[0] & 64);
+      switch (first) {
+        case 0:
+          dtc += "P";
+          break;
+        case 64:
+          dtc += "C";
+          break;
+        case 128:
+          dtc += "B";
+          break;
+        case 64 + 128:
+          dtc += "U";
+          break;
+      }
+      var second = (byte[0] & 32) + (byte[0] & 16);
+      switch (second) {
+        case 0:
+          dtc += "0";
+          break;
+        case 16:
+          dtc += "1";
+          break;
+        case 32:
+          dtc += "2";
+          break;
+        case 16 + 32:
+          dtc += "3";
+          break;
+      }
+
+      var third = (byte[0] & 8) + (byte[0] & 4) + (byte[0] & 2) + (byte[0] & 1);
+      dtc += third.toString(16).toUpperCase();
+      var secondbyte = byte[1].toString(16).toUpperCase();
+      if (secondbyte.length == 1) {
+        secondbyte = "0" + secondbyte;
+      }
+      dtc += secondbyte;
+      this.dtcs.push(dtc);
     };
 
     this._parseMode1SupportPage = function (page, data) {
@@ -228,20 +281,22 @@ angular.module('app.serialport', [])
         if (lines[0].indexOf("UNABLE TO CONNECT") > -1) {
           this.state.state = 'ECU Error';
         } else {
-          // Parse the OBDII response to useful data
-          var obd2Response = this._parseObdResponse(lines);
-          var callbackName = obd2Response.id.join(".");
-          console.log("OBDII Response:", callbackName, obd2Response.data);
-
-          // Call the callback for this response id;
-          if (this._callbacks.hasOwnProperty(callbackName)) {
-            this._callbacks[callbackName].call(this, obd2Response);
-          } else if (this._callbacks.hasOwnProperty("" + obd2Response.id[0])) {
-            this._callbacks["" + obd2Response.id[0]].call(this, obd2Response);
+          if (lines[0].indexOf("NO DATA") == -1) {
+            // Parse the OBDII response to useful data
+            var obd2Response = this._parseObdResponse(lines);
+            var callbackName = obd2Response.id.join(".");
+            console.log("OBDII Response:", callbackName, obd2Response.data);
+            // Call the callback for this response id;
+            if (this._callbacks.hasOwnProperty(callbackName)) {
+              this._callbacks[callbackName].call(this, obd2Response);
+            } else if (this._callbacks.hasOwnProperty("" + obd2Response.id[0])) {
+              this._callbacks["" + obd2Response.id[0]].call(this, obd2Response);
+            } else {
+              console.log("No callback for", callbackName);
+            }
           } else {
-            console.log("No callback for", callbackName);
+            console.log("No data received");
           }
-
 
           // Write next command in queue
           if (this._queue.length > 0) {
@@ -531,6 +586,8 @@ angular.module('app.serialport', [])
       },
       '40': {'available': false, byte: 3, bit: 1, 'name': 'PIDs supported [21 - 40]', value: 0}
     };
+
+    this.dtcs = [];
 
     return this;
   }]);

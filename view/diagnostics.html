@@ -1,0 +1,17 @@
+<div class="panel panel-paper">
+    <div class="panel-heading">Diagnostics</div>
+    <div class="panel-body">
+        <button type="button" class="btn btn-default" ng-click="getDTC()">Get trouble codes</button>
+        <button type="button" class="btn btn-default" ng-click="clearDTC()">Clear check-engine light</button>
+    </div>
+    <table class="table table-striped">
+        <tr ng-repeat="dtc in elm327.dtcs">
+            <td>{{ dtc }}</td>
+            <td>
+                <a href="http://www.dtcsearch.com/{{ dtc}}/" target="_blank" class="btn btn-default">
+                    Search on dtcsearch.com
+                </a>
+            </td>
+        </tr>
+    </table>
+</div>

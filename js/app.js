@@ -11,6 +11,10 @@ angular.module('app', [
       .state('connection', {
         url: "/connection",
         templateUrl: "view/connection.html"
+      })
+      .state('diagnostics', {
+        url: "/diagnostics",
+        templateUrl: "view/diagnostics.html"
       });
   }])
   .controller('app', function ($scope, elm327) {
@@ -39,9 +43,19 @@ angular.module('app', [
     $scope.checkAll = function () {
       for (var key in $scope.elm327.pids) {
         if ($scope.elm327.pids.hasOwnProperty(key)) {
-          $scope.elm327._queue.push("01" + key + "1\r");
+          if($scope.elm327.pids[key].available) {
+            $scope.elm327._queue.push("01" + key + "1\r");
+          }
         }
       }
+    };
+
+    $scope.getDTC = function(){
+      $scope.elm327._queue.push("03\r");
+    };
+    $scope.clearDTC = function(){
+      $scope.elm327._queue.push("04\r");
+      $scope.elm327._queue.push("03\r");
     };
 
   });
