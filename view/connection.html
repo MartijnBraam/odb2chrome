@@ -45,12 +45,16 @@
                 <th>Value</th>
                 <th>Unit</th>
                 <th>Available</th>
+                <th>Enabled</th>
             </tr>
             <tr ng-repeat="pid in elm327.pids" ng-hide="!pid.available && hideUnavailableSensors">
                 <td>{{ pid.name }}</td>
                 <td>{{ pid.value }}</td>
                 <td>{{ pid.unit }}</td>
                 <td>{{ pid.available }}</td>
+                <td>
+                    <input type="checkbox" ng-model="pid.enabled" ng-show="pid.available == 'true'">
+                </td>
             </tr>
         </table>
     </div>

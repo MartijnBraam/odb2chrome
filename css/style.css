@@ -6496,3 +6496,6 @@ nav ul li a:hover {
 tr.ng-hide td {
   display: none;
 }
+input.ng-hide {
+  display: none;
+}
