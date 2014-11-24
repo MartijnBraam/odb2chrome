@@ -30,6 +30,14 @@ angular.module('app.home', ['ngRoute'])
     $scope.connect = function(){
       $scope.elm327.config.port = "/dev/ttyUSB0";
       elm327.connect();
-    }
+    };
+
+    $scope.checkAll = function(){
+      for(var key in $scope.elm327.pids){
+        if($scope.elm327.pids.hasOwnProperty(key)){
+          $scope.elm327._queue.push("01" + key + "\r");
+        }
+      }
+    };
 
   });

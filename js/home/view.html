@@ -4,7 +4,8 @@
         <div class="row">
             <div class="col-xs-6">
                 <label for="serialport">ELM327 connection port</label>
-                <select ng-model="serialPort.port" id="serialport" class="form-control" ng-disabled="serialPortsRefreshing">
+                <select ng-model="serialPort.port" id="serialport" class="form-control"
+                        ng-disabled="serialPortsRefreshing">
                     <option ng-repeat="port in serialPorts">{{ port.path }}</option>
                 </select>
             </div>
@@ -33,9 +34,11 @@
 <div class="panel panel-paper">
     <div class="panel-heading">Sensor availability</div>
     <div class="panel-body">
-        <label>
+        <label class="pull-left">
             <input type="checkbox" id="hidesensors" ng-model="hideUnavailableSensors"> Hide unavailable sensors
         </label>
+        <button type="button" ng-click="checkAll()" class="btn btn-default pull-right">Check all available once</button>
+        <br><br>
         <table class="table table-striped">
             <tr>
                 <th>Name</th>
