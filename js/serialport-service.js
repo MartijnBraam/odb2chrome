@@ -148,6 +148,9 @@ angular.module('app.serialport', [])
         } else {
           this.pids[pid].value = response.data;
         }
+        if(this.pids[pid].hasOwnProperty("enabled") && this.pids[pid].enabled){
+          this._queue.push("01"+pid+"1\r");
+        }
         $rootScope.$apply();
       },
       "3": function (response) {
@@ -287,6 +290,7 @@ angular.module('app.serialport', [])
         // Check for connection issue
         if (lines[0].indexOf("UNABLE TO CONNECT") > -1) {
           this.state.state = 'ECU Error';
+          $rootScope.$apply();
         } else {
           if (lines[0].indexOf("NO DATA") == -1) {
             // Parse the OBDII response to useful data
@@ -344,6 +348,8 @@ angular.module('app.serialport', [])
         'name': 'Calculated engine load value',
         unit: '%',
         value: 0,
+        min: 0,
+        max: 100,
         calc: function (data) {
           return data[0] * 100 / 255;
         }
@@ -355,6 +361,8 @@ angular.module('app.serialport', [])
         'name': 'Engine coolant temperature',
         unit: '°C',
         value: 0,
+        min: -40,
+        max: 215,
         calc: function (data) {
           return data[0] - 40;
         }
@@ -366,6 +374,8 @@ angular.module('app.serialport', [])
         'name': 'Short term fuel % trim—Bank 1',
         unit: '%',
         value: 0,
+        min: -100,
+        max: 99.22,
         calc: function (data) {
           return (data[0] - 128) * (100 / 128);
         }
@@ -377,6 +387,8 @@ angular.module('app.serialport', [])
         'name': 'Long term fuel % trim—Bank 1',
         unit: '%',
         value: 0,
+        min: -100,
+        max: 99.22,
         calc: function (data) {
           return (data[0] - 128) * (100 / 128);
         }
@@ -388,6 +400,8 @@ angular.module('app.serialport', [])
         'name': 'Short term fuel % trim—Bank 2',
         unit: '%',
         value: 0,
+        min: -100,
+        max: 99.22,
         calc: function (data) {
           return (data[0] - 128) * (100 / 128);
         }
@@ -400,6 +414,8 @@ angular.module('app.serialport', [])
         'name': 'Long term fuel % trim—Bank 2',
         unit: '%',
         value: 0,
+        min: -100,
+        max: 99.22,
         calc: function (data) {
           return (data[0] - 128) * (100 / 128);
         }
@@ -411,6 +427,8 @@ angular.module('app.serialport', [])
         'name': 'Fuel pressure',
         unit: 'kPa',
         value: 0,
+        min: 0,
+        max: 765,
         calc: function (data) {
           return data[0] * 3;
         }
@@ -422,6 +440,8 @@ angular.module('app.serialport', [])
         'name': 'Intake manifold absolute pressure',
         unit: 'kPa',
         value: 0,
+        min: 0,
+        max: 255,
         calc: function (data) {
           return data[0];
         }
@@ -433,6 +453,8 @@ angular.module('app.serialport', [])
         'name': 'Engine RPM',
         unit: 'rpm',
         value: 0,
+        min: 0,
+        max: 10000,
         calc: function (data) {
           return ((data[0] * 256) + data[1]) / 4;
         }
@@ -444,6 +466,8 @@ angular.module('app.serialport', [])
         'name': 'Vehicle speed',
         unit: 'km/h',
         value: 0,
+        min: 0,
+        max: 255,
         calc: function (data) {
           return data[0];
         }
@@ -453,7 +477,7 @@ angular.module('app.serialport', [])
         byte: 1,
         bit: 3,
         'name': 'Timing advance',
-        unit: '° relative to first cylinder',
+        unit: 'degree',
         value: 0,
         calc: function (data) {
           return (data[0] - 128) / 2;

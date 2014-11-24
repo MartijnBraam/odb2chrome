@@ -6477,6 +6477,23 @@ nav ul li a:hover {
   position: relative;
   background: #F7F7F7;
 }
+.graph .background .meter {
+  fill: #333;
+}
+.graph .background .meterdot {
+  stroke: #FFF;
+  stroke-width: 1;
+}
+.graph .valueLabel {
+  fill: #FFF;
+}
+.graph .wiper {
+  stroke: #ff6700;
+  stroke-width: 3;
+}
+.graph .wipercap {
+  fill: #555;
+}
 .panel-paper {
   background: white;
   border-radius: 2px;
