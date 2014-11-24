@@ -132,6 +132,18 @@ angular.module('app.serialport', [])
       },
       "1.20": function (response) {
         this._parseMode1SupportPage(1, response.data);
+      },
+      "1": function (response) {
+        var pid = response.id[1].toString(16).toUpperCase();
+        if (pid.length == 1) {
+          pid = "0" + pid;
+        }
+        if (this.pids[pid].hasOwnProperty("calc")) {
+          this.pids[pid].value = this.pids[pid].calc(response.data);
+        } else {
+          this.pids[pid].value = response.data;
+        }
+        $rootScope.$apply();
       }
     };
 
@@ -222,13 +234,21 @@ angular.module('app.serialport', [])
           console.log("OBDII Response:", callbackName, obd2Response.data);
 
           // Call the callback for this response id;
-          this._callbacks[callbackName].call(this, obd2Response);
+          if (this._callbacks.hasOwnProperty(callbackName)) {
+            this._callbacks[callbackName].call(this, obd2Response);
+          } else if (this._callbacks.hasOwnProperty("" + obd2Response.id[0])) {
+            this._callbacks["" + obd2Response.id[0]].call(this, obd2Response);
+          } else {
+            console.log("No callback for", callbackName);
+          }
+
 
           // Write next command in queue
           if (this._queue.length > 0) {
             this.write(this._queue.shift());
           } else {
             console.log("queue empty!");
+            this.write("0104\r");
           }
         }
 
@@ -238,41 +258,118 @@ angular.module('app.serialport', [])
 
     this.pids = {
       // Page 1
-      '01': {'available': false, byte: 0, bit: 8, 'name': 'Monitor status since DTCs cleared', unit: ''},
-      '02': {'available': false, byte: 0, bit: 7, 'name': 'Freeze DTC', unit: ''},
-      '03': {'available': false, byte: 0, bit: 6, 'name': 'Fuel system status', unit: ''},
-      '04': {'available': false, byte: 0, bit: 5, 'name': 'Calculated engine load value', unit: '%'},
-      '05': {'available': false, byte: 0, bit: 4, 'name': 'Engine coolant temperature', unit: '°C'},
-      '06': {'available': false, byte: 0, bit: 3, 'name': 'Short term fuel % trim—Bank 1', unit: '%'},
-      '07': {'available': false, byte: 0, bit: 2, 'name': 'Long term fuel % trim—Bank 1', unit: '%'},
-      '08': {'available': false, byte: 0, bit: 1, 'name': 'Short term fuel % trim—Bank 2', unit: '%'},
+      '01': {'available': false, byte: 0, bit: 8, 'name': 'Monitor status since DTCs cleared', unit: '', value: 0},
+      '02': {'available': false, byte: 0, bit: 7, 'name': 'Freeze DTC', unit: '', value: 0},
+      '03': {'available': false, byte: 0, bit: 6, 'name': 'Fuel system status', unit: '', value: 0},
+      '04': {
+        'available': false,
+        byte: 0,
+        bit: 5,
+        'name': 'Calculated engine load value',
+        unit: '%',
+        value: 0,
+        calc: function (data) {
+          return data[0] * 100 / 255;
+        }
+      },
+      '05': {
+        'available': false,
+        byte: 0,
+        bit: 4,
+        'name': 'Engine coolant temperature',
+        unit: '°C',
+        value: 0,
+        calc: function (data) {
+          return data[0] - 40;
+        }
+      },
+      '06': {
+        'available': false,
+        byte: 0,
+        bit: 3,
+        'name': 'Short term fuel % trim—Bank 1',
+        unit: '%',
+        value: 0,
+        calc: function (data) {
+          return (data[0] - 128) * (100 / 128);
+        }
+      },
+      '07': {
+        'available': false,
+        byte: 0,
+        bit: 2,
+        'name': 'Long term fuel % trim—Bank 1',
+        unit: '%',
+        value: 0,
+        calc: function (data) {
+          return (data[0] - 128) * (100 / 128);
+        }
+      },
+      '08': {
+        'available': false,
+        byte: 0,
+        bit: 1,
+        'name': 'Short term fuel % trim—Bank 2',
+        unit: '%',
+        value: 0,
+        calc: function (data) {
+          return (data[0] - 128) * (100 / 128);
+        }
+      },
 
-      '09': {'available': false, byte: 1, bit: 8, 'name': 'Long term fuel % trim—Bank 2', unit: '%'},
-      '0A': {'available': false, byte: 1, bit: 7, 'name': 'Fuel pressure', unit: 'kPa'},
-      '0B': {'available': false, byte: 1, bit: 6, 'name': 'Intake manifold absolute pressure', unit: 'kPa'},
-      '0C': {'available': false, byte: 1, bit: 5, 'name': 'Engine RPM', unit: 'rpm'},
-      '0D': {'available': false, byte: 1, bit: 4, 'name': 'Vehicle speed', unit: 'km/h'},
-      '0E': {'available': false, byte: 1, bit: 3, 'name': 'Timing advance', unit: '° relative to first cylinder'},
-      '0F': {'available': false, byte: 1, bit: 2, 'name': 'Intake air temperature', unit: '°C'},
-      '10': {'available': false, byte: 1, bit: 1, 'name': 'MAF air flow rate', unit: 'grams/sec'},
+      '09': {
+        'available': false,
+        byte: 1,
+        bit: 8,
+        'name': 'Long term fuel % trim—Bank 2',
+        unit: '%',
+        value: 0,
+        calc: function (data) {
+          return (data[0] - 128) * (100 / 128);
+        }
+      },
+      '0A': {
+        'available': false,
+        byte: 1,
+        bit: 7,
+        'name': 'Fuel pressure',
+        unit: 'kPa',
+        value: 0,
+        calc: function (data) {
+          return data[0] * 3;
+        }
+      },
+      '0B': {'available': false, byte: 1, bit: 6, 'name': 'Intake manifold absolute pressure', unit: 'kPa', value: 0},
+      '0C': {'available': false, byte: 1, bit: 5, 'name': 'Engine RPM', unit: 'rpm', value: 0},
+      '0D': {'available': false, byte: 1, bit: 4, 'name': 'Vehicle speed', unit: 'km/h', value: 0},
+      '0E': {
+        'available': false,
+        byte: 1,
+        bit: 3,
+        'name': 'Timing advance',
+        unit: '° relative to first cylinder',
+        value: 0
+      },
+      '0F': {'available': false, byte: 1, bit: 2, 'name': 'Intake air temperature', unit: '°C', value: 0},
+      '10': {'available': false, byte: 1, bit: 1, 'name': 'MAF air flow rate', unit: 'grams/sec', value: 0},
 
-      '11': {'available': false, byte: 2, bit: 8, 'name': 'Throttle position', unit: '%'},
-      '12': {'available': false, byte: 2, bit: 7, 'name': 'Commanded secondary air status', unit: ''},
-      '13': {'available': false, byte: 2, bit: 6, 'name': 'Oxygen sensors present', unit: ''},
-      '14': {'available': false, byte: 2, bit: 5, 'name': 'Bank 1, Sensor 1', unit: 'V'},
-      '15': {'available': false, byte: 2, bit: 4, 'name': 'Bank 1, Sensor 2', unit: 'V'},
-      '16': {'available': false, byte: 2, bit: 3, 'name': 'Bank 1, Sensor 3', unit: 'V'},
-      '17': {'available': false, byte: 2, bit: 2, 'name': 'Bank 1, Sensor 4', unit: 'V'},
-      '18': {'available': false, byte: 2, bit: 1, 'name': 'Bank 2, Sensor 1', unit: 'V'},
+      '11': {'available': false, byte: 2, bit: 8, 'name': 'Throttle position', unit: '%', value: 0},
+      '12': {'available': false, byte: 2, bit: 7, 'name': 'Commanded secondary air status', unit: '', value: 0},
+      '13': {'available': false, byte: 2, bit: 6, 'name': 'Oxygen sensors present', unit: '', value: 0},
+      '14': {'available': false, byte: 2, bit: 5, 'name': 'Bank 1, Sensor 1', unit: 'V', value: 0},
+      '15': {'available': false, byte: 2, bit: 4, 'name': 'Bank 1, Sensor 2', unit: 'V', value: 0},
+      '16': {'available': false, byte: 2, bit: 3, 'name': 'Bank 1, Sensor 3', unit: 'V', value: 0},
+      '17': {'available': false, byte: 2, bit: 2, 'name': 'Bank 1, Sensor 4', unit: 'V', value: 0},
+      '18': {'available': false, byte: 2, bit: 1, 'name': 'Bank 2, Sensor 1', unit: 'V', value: 0},
 
-      '19': {'available': false, byte: 3, bit: 8, 'name': 'Bank 2, Sensor 2', unit: 'V'},
-      '1A': {'available': false, byte: 3, bit: 7, 'name': 'Bank 2, Sensor 3', unit: 'V'},
-      '1B': {'available': false, byte: 3, bit: 6, 'name': 'Bank 2, Sensor 4', unit: 'V'},
-      '1C': {'available': false, byte: 3, bit: 5, 'name': 'OBD standards this vehicle conforms to', unit: ''},
-      '1D': {'available': false, byte: 3, bit: 4, 'name': 'Oxygen sensors present', unit: ''},
-      '1E': {'available': false, byte: 3, bit: 3, 'name': 'Auxiliary input status', unit: ''},
-      '1F': {'available': false, byte: 3, bit: 2, 'name': 'Run time since engine start', unit: 'seconds'},
-      '20': {'available': false, byte: 3, bit: 1, 'name': 'PIDs supported [21 - 40]', unit: ''},
+      '19': {'available': false, byte: 3, bit: 8, 'name': 'Bank 2, Sensor 2', unit: 'V', value: 0},
+      '1A': {'available': false, byte: 3, bit: 7, 'name': 'Bank 2, Sensor 3', unit: 'V', value: 0},
+      '1B': {'available': false, byte: 3, bit: 6, 'name': 'Bank 2, Sensor 4', unit: 'V', value: 0},
+      '1C': {'available': false, byte: 3, bit: 5, 'name': 'OBD standards this vehicle conforms to', unit: '', value: 0},
+      '1D': {'available': false, byte: 3, bit: 4, 'name': 'Oxygen sensors present', unit: '', value: 0},
+      '1E': {'available': false, byte: 3, bit: 3, 'name': 'Auxiliary input status', unit: '', value: 0},
+      '1F': {'available': false, byte: 3, bit: 2, 'name': 'Run time since engine start', unit: 'seconds', value: 0},
+      '20': {'available': false, byte: 3, bit: 1, 'name': 'PIDs supported [21 - 40]', unit: '', value: 0},
 
       // Page 2
       '21': {
@@ -280,54 +377,92 @@ angular.module('app.serialport', [])
         byte: 0,
         bit: 8,
         'name': 'Distance traveled with malfunction indicator lamp (MIL) on',
-        unit: 'km'
+        unit: 'km',
+        value: 0
       },
       '22': {
         'available': false,
         byte: 0,
         bit: 7,
         'name': 'Fuel Rail Pressure (relative to manifold vacuum)',
-        unit: 'kPa'
+        unit: 'kPa',
+        value: 0
       },
       '23': {
         'available': false,
         byte: 0,
         bit: 6,
         'name': 'Fuel Rail Pressure (diesel, or gasoline direct inject)',
-        unit: 'kPa'
+        unit: 'kPa',
+        value: 0
       },
-      '24': {'available': false, byte: 0, bit: 5, 'name': 'O2S1_WR_lambda(1): Voltage', unit: 'V'},
-      '25': {'available': false, byte: 0, bit: 4, 'name': 'O2S2_WR_lambda(1): Voltage', unit: 'V'},
-      '26': {'available': false, byte: 0, bit: 3, 'name': 'O2S3_WR_lambda(1): Voltage', unit: 'V'},
-      '27': {'available': false, byte: 0, bit: 2, 'name': 'O2S4_WR_lambda(1): Voltage', unit: 'V'},
-      '28': {'available': false, byte: 0, bit: 1, 'name': 'O2S5_WR_lambda(1): Voltage', unit: 'V'},
+      '24': {'available': false, byte: 0, bit: 5, 'name': 'O2S1_WR_lambda(1): Voltage', unit: 'V', value: 0},
+      '25': {'available': false, byte: 0, bit: 4, 'name': 'O2S2_WR_lambda(1): Voltage', unit: 'V', value: 0},
+      '26': {'available': false, byte: 0, bit: 3, 'name': 'O2S3_WR_lambda(1): Voltage', unit: 'V', value: 0},
+      '27': {'available': false, byte: 0, bit: 2, 'name': 'O2S4_WR_lambda(1): Voltage', unit: 'V', value: 0},
+      '28': {'available': false, byte: 0, bit: 1, 'name': 'O2S5_WR_lambda(1): Voltage', unit: 'V', value: 0},
 
-      '29': {'available': false, byte: 1, bit: 8, 'name': 'O2S6_WR_lambda(1): Voltage', unit: 'V'},
-      '2A': {'available': false, byte: 1, bit: 7, 'name': 'O2S7_WR_lambda(1): Voltage', unit: 'V'},
-      '2B': {'available': false, byte: 1, bit: 6, 'name': 'O2S8_WR_lambda(1): Voltage', unit: 'V'},
-      '2C': {'available': false, byte: 1, bit: 5, 'name': 'Commanded EGR', unit: '%'},
-      '2D': {'available': false, byte: 1, bit: 4, 'name': 'EGR Error', unit: '%'},
-      '2E': {'available': false, byte: 1, bit: 3, 'name': 'Commanded evaporative purge', unit: '%'},
-      '2F': {'available': false, byte: 1, bit: 2, 'name': 'Fuel Level Input', unit: '%'},
-      '30': {'available': false, byte: 1, bit: 1, 'name': 'number of warm-ups since codes cleared', unit: ''},
+      '29': {'available': false, byte: 1, bit: 8, 'name': 'O2S6_WR_lambda(1): Voltage', unit: 'V', value: 0},
+      '2A': {'available': false, byte: 1, bit: 7, 'name': 'O2S7_WR_lambda(1): Voltage', unit: 'V', value: 0},
+      '2B': {'available': false, byte: 1, bit: 6, 'name': 'O2S8_WR_lambda(1): Voltage', unit: 'V', value: 0},
+      '2C': {'available': false, byte: 1, bit: 5, 'name': 'Commanded EGR', unit: '%', value: 0},
+      '2D': {'available': false, byte: 1, bit: 4, 'name': 'EGR Error', unit: '%', value: 0},
+      '2E': {'available': false, byte: 1, bit: 3, 'name': 'Commanded evaporative purge', unit: '%', value: 0},
+      '2F': {'available': false, byte: 1, bit: 2, 'name': 'Fuel Level Input', unit: '%', value: 0},
+      '30': {'available': false, byte: 1, bit: 1, 'name': 'number of warm-ups since codes cleared', unit: '', value: 0},
 
-      '31': {'available': false, byte: 2, bit: 8, 'name': 'Distance traveled since codes cleared', unit: 'km'},
-      '32': {'available': false, byte: 2, bit: 7, 'name': 'Evap. System Vapor Pressure', unit: 'Pa'},
-      '33': {'available': false, byte: 2, bit: 6, 'name': 'Barometric pressure', unit: 'kPa'},
-      '34': {'available': false, byte: 2, bit: 5, 'name': 'O2S1_WR_lambda(1): Current', unit: 'mA'},
-      '35': {'available': false, byte: 2, bit: 4, 'name': 'O2S2_WR_lambda(1): Current', unit: 'mA'},
-      '36': {'available': false, byte: 2, bit: 3, 'name': 'O2S3_WR_lambda(1): Current', unit: 'mA'},
-      '37': {'available': false, byte: 2, bit: 2, 'name': 'O2S4_WR_lambda(1): Current', unit: 'mA'},
-      '38': {'available': false, byte: 2, bit: 1, 'name': 'O2S5_WR_lambda(1): Current', unit: 'mA'},
+      '31': {
+        'available': false,
+        byte: 2,
+        bit: 8,
+        'name': 'Distance traveled since codes cleared',
+        unit: 'km',
+        value: 0
+      },
+      '32': {'available': false, byte: 2, bit: 7, 'name': 'Evap. System Vapor Pressure', unit: 'Pa', value: 0},
+      '33': {'available': false, byte: 2, bit: 6, 'name': 'Barometric pressure', unit: 'kPa', value: 0},
+      '34': {'available': false, byte: 2, bit: 5, 'name': 'O2S1_WR_lambda(1): Current', unit: 'mA', value: 0},
+      '35': {'available': false, byte: 2, bit: 4, 'name': 'O2S2_WR_lambda(1): Current', unit: 'mA', value: 0},
+      '36': {'available': false, byte: 2, bit: 3, 'name': 'O2S3_WR_lambda(1): Current', unit: 'mA', value: 0},
+      '37': {'available': false, byte: 2, bit: 2, 'name': 'O2S4_WR_lambda(1): Current', unit: 'mA', value: 0},
+      '38': {'available': false, byte: 2, bit: 1, 'name': 'O2S5_WR_lambda(1): Current', unit: 'mA', value: 0},
 
-      '39': {'available': false, byte: 3, bit: 8, 'name': 'O2S6_WR_lambda(1): Current', unit: 'mA'},
-      '3A': {'available': false, byte: 3, bit: 7, 'name': 'O2S7_WR_lambda(1): Current', unit: 'mA'},
-      '3B': {'available': false, byte: 3, bit: 6, 'name': 'O2S8_WR_lambda(1): Current', unit: 'mA'},
-      '3C': {'available': false, byte: 3, bit: 5, 'name': 'Catalyst Temperature: Bank 1, Sensor 1', unit: '°C'},
-      '3D': {'available': false, byte: 3, bit: 4, 'name': 'Catalyst Temperature: Bank 2, Sensor 1', unit: '°C'},
-      '3E': {'available': false, byte: 3, bit: 3, 'name': 'Catalyst Temperature: Bank 1, Sensor 2', unit: '°C'},
-      '3F': {'available': false, byte: 3, bit: 2, 'name': 'Catalyst Temperature: Bank 2, Sensor 2', unit: '°C'},
-      '40': {'available': false, byte: 3, bit: 1, 'name': 'PIDs supported [21 - 40]'}
+      '39': {'available': false, byte: 3, bit: 8, 'name': 'O2S6_WR_lambda(1): Current', unit: 'mA', value: 0},
+      '3A': {'available': false, byte: 3, bit: 7, 'name': 'O2S7_WR_lambda(1): Current', unit: 'mA', value: 0},
+      '3B': {'available': false, byte: 3, bit: 6, 'name': 'O2S8_WR_lambda(1): Current', unit: 'mA', value: 0},
+      '3C': {
+        'available': false,
+        byte: 3,
+        bit: 5,
+        'name': 'Catalyst Temperature: Bank 1, Sensor 1',
+        unit: '°C',
+        value: 0
+      },
+      '3D': {
+        'available': false,
+        byte: 3,
+        bit: 4,
+        'name': 'Catalyst Temperature: Bank 2, Sensor 1',
+        unit: '°C',
+        value: 0
+      },
+      '3E': {
+        'available': false,
+        byte: 3,
+        bit: 3,
+        'name': 'Catalyst Temperature: Bank 1, Sensor 2',
+        unit: '°C',
+        value: 0
+      },
+      '3F': {
+        'available': false,
+        byte: 3,
+        bit: 2,
+        'name': 'Catalyst Temperature: Bank 2, Sensor 2',
+        unit: '°C',
+        value: 0
+      },
+      '40': {'available': false, byte: 3, bit: 1, 'name': 'PIDs supported [21 - 40]', value: 0}
     };
 
     return this;

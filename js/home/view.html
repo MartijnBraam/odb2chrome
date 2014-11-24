@@ -39,11 +39,13 @@
         <table class="table table-striped">
             <tr>
                 <th>Name</th>
+                <th>Value</th>
                 <th>Unit</th>
                 <th>Available</th>
             </tr>
             <tr ng-repeat="pid in elm327.pids" ng-hide="!pid.available && hideUnavailableSensors">
                 <td>{{ pid.name }}</td>
+                <td>{{ pid.value }}</td>
                 <td>{{ pid.unit }}</td>
                 <td>{{ pid.available }}</td>
             </tr>
