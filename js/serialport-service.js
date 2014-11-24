@@ -118,8 +118,19 @@ angular.module('app.serialport', [])
     this._queue = [];
 
     this._callbacks = {
-      "1.0": function (data) {
-        console.log("WORKING!");
+      "1.0": function (response) {
+        this._parseMode1SupportPage(0, response.data);
+      }
+    };
+
+    this._parseMode1SupportPage = function (page, data) {
+      for (var key in this.pids) {
+        if (this.pids.hasOwnProperty(key)) {
+          var pidId = parseInt("0x" + key, 16);
+          if (pidId >= page * 32 && pidId < (page + 1) * 32) {
+            this.pids[key].available = (data[this.pids[key].byte] & (Math.pow(2, this.pids[key].bit - 1))) > 0;
+          }
+        }
       }
     };
 
@@ -170,34 +181,72 @@ angular.module('app.serialport', [])
             this.write("0100\r"); // OBDII command 01 00 (Get Mode 01 support)
             break;
         }
-      }else{
+      } else {
         // Remove useless status information
-        if(lines[0].indexOf("SEARCHING")>-1){
+        if (lines[0].indexOf("SEARCHING") > -1) {
           lines.shift();
         }
 
         // Check for connection issue
-        if(lines[0].indexOf("UNABLE TO CONNECT")>-1){
-          this.state.state='ECU Error';
-        }else{
+        if (lines[0].indexOf("UNABLE TO CONNECT") > -1) {
+          this.state.state = 'ECU Error';
+        } else {
           // Parse the OBDII response to useful data
           var obd2Response = this._parseObdResponse(lines);
           var callbackName = obd2Response.id.join(".");
           console.log("OBDII Response:", callbackName, obd2Response.data);
 
           // Call the callback for this response id;
-          this._callbacks[callbackName](obd2Response);
+          this._callbacks[callbackName].call(this, obd2Response);
 
           // Write next command in queue
-          if(this._queue.length > 0){
+          if (this._queue.length > 0) {
             this.write(this._queue.shift());
-          }else{
+          } else {
             console.log("queue empty!");
           }
         }
 
 
       }
+    };
+
+    this.pids = {
+      '01': {'available': false, byte: 0, bit: 8, 'name': 'Monitor status since DTCs cleared'},
+      '02': {'available': false, byte: 0, bit: 7, 'name': 'Freeze DTC'},
+      '03': {'available': false, byte: 0, bit: 6, 'name': 'Fuel system status'},
+      '04': {'available': false, byte: 0, bit: 5, 'name': 'Calculated engine load value'},
+      '05': {'available': false, byte: 0, bit: 4, 'name': 'Engine coolant temperature'},
+      '06': {'available': false, byte: 0, bit: 3, 'name': 'Short term fuel % trim—Bank 1'},
+      '07': {'available': false, byte: 0, bit: 2, 'name': 'Long term fuel % trim—Bank 1'},
+      '08': {'available': false, byte: 0, bit: 1, 'name': 'Short term fuel % trim—Bank 2'},
+
+      '09': {'available': false, byte: 1, bit: 8, 'name': 'Long term fuel % trim—Bank 2'},
+      '0A': {'available': false, byte: 1, bit: 7, 'name': 'Fuel pressure'},
+      '0B': {'available': false, byte: 1, bit: 6, 'name': 'Intake manifold absolute pressure'},
+      '0C': {'available': false, byte: 1, bit: 5, 'name': 'Engine RPM'},
+      '0D': {'available': false, byte: 1, bit: 4, 'name': 'Vehicle speed'},
+      '0E': {'available': false, byte: 1, bit: 3, 'name': 'Timing advance'},
+      '0F': {'available': false, byte: 1, bit: 2, 'name': 'Intake air temperature'},
+      '10': {'available': false, byte: 1, bit: 1, 'name': 'MAF air flow rate'},
+
+      '11': {'available': false, byte: 2, bit: 8, 'name': 'Throttle position'},
+      '12': {'available': false, byte: 2, bit: 7, 'name': 'Commanded secondary air status'},
+      '13': {'available': false, byte: 2, bit: 6, 'name': 'Oxygen sensors present'},
+      '14': {'available': false, byte: 2, bit: 5, 'name': 'Bank 1, Sensor 1'},
+      '15': {'available': false, byte: 2, bit: 4, 'name': 'Bank 1, Sensor 2'},
+      '16': {'available': false, byte: 2, bit: 3, 'name': 'Bank 1, Sensor 3'},
+      '17': {'available': false, byte: 2, bit: 2, 'name': 'Bank 1, Sensor 4'},
+      '18': {'available': false, byte: 2, bit: 1, 'name': 'Bank 2, Sensor 1'},
+
+      '19': {'available': false, byte: 3, bit: 8, 'name': 'Bank 2, Sensor 2'},
+      '1A': {'available': false, byte: 3, bit: 7, 'name': 'Bank 2, Sensor 3'},
+      '1B': {'available': false, byte: 3, bit: 6, 'name': 'Bank 2, Sensor 4'},
+      '1C': {'available': false, byte: 3, bit: 5, 'name': 'OBD standards this vehicle conforms to'},
+      '1D': {'available': false, byte: 3, bit: 4, 'name': 'Oxygen sensors present'},
+      '1E': {'available': false, byte: 3, bit: 3, 'name': 'Auxiliary input status'},
+      '1F': {'available': false, byte: 3, bit: 2, 'name': 'Run time since engine start'},
+      '20': {'available': false, byte: 3, bit: 1, 'name': 'PIDs supported [21 - 40]'}
     };
 
     return this;
