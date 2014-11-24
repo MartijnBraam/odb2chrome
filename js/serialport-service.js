@@ -353,19 +353,72 @@ angular.module('app.serialport', [])
           return data[0] * 3;
         }
       },
-      '0B': {'available': false, byte: 1, bit: 6, 'name': 'Intake manifold absolute pressure', unit: 'kPa', value: 0},
-      '0C': {'available': false, byte: 1, bit: 5, 'name': 'Engine RPM', unit: 'rpm', value: 0},
-      '0D': {'available': false, byte: 1, bit: 4, 'name': 'Vehicle speed', unit: 'km/h', value: 0},
+      '0B': {
+        'available': false,
+        byte: 1,
+        bit: 6,
+        'name': 'Intake manifold absolute pressure',
+        unit: 'kPa',
+        value: 0,
+        calc: function (data) {
+          return data[0];
+        }
+      },
+      '0C': {
+        'available': false,
+        byte: 1,
+        bit: 5,
+        'name': 'Engine RPM',
+        unit: 'rpm',
+        value: 0,
+        calc: function (data) {
+          return ((data[0] * 256) + data[1]) / 100;
+        }
+      },
+      '0D': {
+        'available': false,
+        byte: 1,
+        bit: 4,
+        'name': 'Vehicle speed',
+        unit: 'km/h',
+        value: 0,
+        calc: function (data) {
+          return data[0];
+        }
+      },
       '0E': {
         'available': false,
         byte: 1,
         bit: 3,
         'name': 'Timing advance',
         unit: '° relative to first cylinder',
-        value: 0
+        value: 0,
+        calc: function (data) {
+          return (data[0] - 128) / 2;
+        }
       },
-      '0F': {'available': false, byte: 1, bit: 2, 'name': 'Intake air temperature', unit: '°C', value: 0},
-      '10': {'available': false, byte: 1, bit: 1, 'name': 'MAF air flow rate', unit: 'grams/sec', value: 0},
+      '0F': {
+        'available': false,
+        byte: 1,
+        bit: 2,
+        'name': 'Intake air temperature',
+        unit: '°C',
+        value: 0,
+        calc: function (data) {
+          return data[0] - 40;
+        }
+      },
+      '10': {
+        'available': false,
+        byte: 1,
+        bit: 1,
+        'name': 'MAF air flow rate',
+        unit: 'grams/sec',
+        value: 0,
+        calc: function (data) {
+          return ((data[0] * 256) + data[1]) / 100;
+        }
+      },
 
       '11': {'available': false, byte: 2, bit: 8, 'name': 'Throttle position', unit: '%', value: 0},
       '12': {'available': false, byte: 2, bit: 7, 'name': 'Commanded secondary air status', unit: '', value: 0},
