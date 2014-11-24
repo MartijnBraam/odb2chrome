@@ -57,16 +57,11 @@ angular.module('app.graph', [])
             .attr("x1", 75)
             .attr("y1", 75)
             .attr("x2", 140)
-            .attr("y2", 75)
-            .attr("transform", function (d, i) {
-              var angle = meterScale(d);
-              return "rotate(" + angle + " 75 75)";
-            });
-          wiperEnter.append("svg:circle")
-            .attr("cx", 75)
-            .attr("cy", 75)
-            .attr("r", 16)
-            .attr("class", "wipercap");
+            .attr("y2", 75);
+          wiper.transition().attr("transform", function (d, i) {
+            var angle = meterScale(d);
+            return "rotate(" + angle + " 75 75)";
+          });
         });
       }
     };
