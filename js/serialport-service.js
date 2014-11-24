@@ -99,7 +99,12 @@ angular.module('app.serialport', [])
       data.forEach(function (response) {
         if (response != '>') {
           var part = response.split(" ");
-          responseId = part.splice(0, 2);
+          if (part[0] == "41") {
+            responseId = part.splice(0, 2);
+          } else {
+            responseId = part.splice(0, 1);
+            responseId.push(0);
+          }
           ret = ret.concat(part);
         }
       });
@@ -145,9 +150,8 @@ angular.module('app.serialport', [])
         }
         $rootScope.$apply();
       },
-      "3.1": function (response) {
+      "3": function (response) {
         this.dtcs = [];
-        response.data.shift();
         var count = response.data.length / 2;
         for (var i = 0; i < count; i++) {
           var dtc = response.data.slice(i * 2, i * 2 + 2);
@@ -197,7 +201,10 @@ angular.module('app.serialport', [])
         secondbyte = "0" + secondbyte;
       }
       dtc += secondbyte;
-      this.dtcs.push(dtc);
+      console.log("DTC Found:", dtc);
+      if (dtc != "P0000") {
+        this.dtcs.push(dtc);
+      }
     };
 
     this._parseMode1SupportPage = function (page, data) {
@@ -427,7 +434,7 @@ angular.module('app.serialport', [])
         unit: 'rpm',
         value: 0,
         calc: function (data) {
-          return ((data[0] * 256) + data[1]) / 100;
+          return ((data[0] * 256) + data[1]) / 4;
         }
       },
       '0D': {
@@ -475,22 +482,122 @@ angular.module('app.serialport', [])
         }
       },
 
-      '11': {'available': false, byte: 2, bit: 8, 'name': 'Throttle position', unit: '%', value: 0},
+      '11': {
+        'available': false,
+        byte: 2,
+        bit: 8,
+        'name': 'Throttle position',
+        unit: '%',
+        value: 0,
+        calc: function (data) {
+          return data[0] * 100 / 255;
+        }
+      },
       '12': {'available': false, byte: 2, bit: 7, 'name': 'Commanded secondary air status', unit: '', value: 0},
       '13': {'available': false, byte: 2, bit: 6, 'name': 'Oxygen sensors present', unit: '', value: 0},
-      '14': {'available': false, byte: 2, bit: 5, 'name': 'Bank 1, Sensor 1', unit: 'V', value: 0},
-      '15': {'available': false, byte: 2, bit: 4, 'name': 'Bank 1, Sensor 2', unit: 'V', value: 0},
-      '16': {'available': false, byte: 2, bit: 3, 'name': 'Bank 1, Sensor 3', unit: 'V', value: 0},
-      '17': {'available': false, byte: 2, bit: 2, 'name': 'Bank 1, Sensor 4', unit: 'V', value: 0},
-      '18': {'available': false, byte: 2, bit: 1, 'name': 'Bank 2, Sensor 1', unit: 'V', value: 0},
+      '14': {
+        'available': false,
+        byte: 2,
+        bit: 5,
+        'name': 'Bank 1, Sensor 1',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return data[0] / 200;
+        }
+      },
+      '15': {
+        'available': false,
+        byte: 2,
+        bit: 4,
+        'name': 'Bank 1, Sensor 2',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return data[0] / 200;
+        }
+      },
+      '16': {
+        'available': false,
+        byte: 2,
+        bit: 3,
+        'name': 'Bank 1, Sensor 3',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return data[0] / 200;
+        }
+      },
+      '17': {
+        'available': false,
+        byte: 2,
+        bit: 2,
+        'name': 'Bank 1, Sensor 4',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return data[0] / 200;
+        }
+      },
+      '18': {
+        'available': false,
+        byte: 2,
+        bit: 1,
+        'name': 'Bank 2, Sensor 1',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return data[0] / 200;
+        }
+      },
 
-      '19': {'available': false, byte: 3, bit: 8, 'name': 'Bank 2, Sensor 2', unit: 'V', value: 0},
-      '1A': {'available': false, byte: 3, bit: 7, 'name': 'Bank 2, Sensor 3', unit: 'V', value: 0},
-      '1B': {'available': false, byte: 3, bit: 6, 'name': 'Bank 2, Sensor 4', unit: 'V', value: 0},
+      '19': {
+        'available': false,
+        byte: 3,
+        bit: 8,
+        'name': 'Bank 2, Sensor 2',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return data[0] / 200;
+        }
+      },
+      '1A': {
+        'available': false,
+        byte: 3,
+        bit: 7,
+        'name': 'Bank 2, Sensor 3',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return data[0] / 200;
+        }
+      },
+      '1B': {
+        'available': false,
+        byte: 3,
+        bit: 6,
+        'name': 'Bank 2, Sensor 4',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return data[0] / 200;
+        }
+      },
       '1C': {'available': false, byte: 3, bit: 5, 'name': 'OBD standards this vehicle conforms to', unit: '', value: 0},
       '1D': {'available': false, byte: 3, bit: 4, 'name': 'Oxygen sensors present', unit: '', value: 0},
       '1E': {'available': false, byte: 3, bit: 3, 'name': 'Auxiliary input status', unit: '', value: 0},
-      '1F': {'available': false, byte: 3, bit: 2, 'name': 'Run time since engine start', unit: 'seconds', value: 0},
+      '1F': {
+        'available': false,
+        byte: 3,
+        bit: 2,
+        'name': 'Run time since engine start',
+        unit: 'seconds',
+        value: 0,
+        calc: function (data) {
+          return (data[0] * 256) + data[1];
+        }
+      },
       '20': {'available': false, byte: 3, bit: 1, 'name': 'PIDs supported [21 - 40]', unit: '', value: 0},
 
       // Page 2
@@ -500,7 +607,10 @@ angular.module('app.serialport', [])
         bit: 8,
         'name': 'Distance traveled with malfunction indicator lamp (MIL) on',
         unit: 'km',
-        value: 0
+        value: 0,
+        calc: function (data) {
+          return (data[0] * 256) + data[1];
+        }
       },
       '22': {
         'available': false,
@@ -508,7 +618,10 @@ angular.module('app.serialport', [])
         bit: 7,
         'name': 'Fuel Rail Pressure (relative to manifold vacuum)',
         unit: 'kPa',
-        value: 0
+        value: 0,
+        calc: function (data) {
+          return ((data[0] * 256 ) + data[1]) * 0.079;
+        }
       },
       '23': {
         'available': false,
@@ -516,19 +629,115 @@ angular.module('app.serialport', [])
         bit: 6,
         'name': 'Fuel Rail Pressure (diesel, or gasoline direct inject)',
         unit: 'kPa',
-        value: 0
+        value: 0,
+        calc: function (data) {
+          return ((data[0] * 256 ) + data[1]) * 10;
+        }
       },
-      '24': {'available': false, byte: 0, bit: 5, 'name': 'O2S1_WR_lambda(1): Voltage', unit: 'V', value: 0},
-      '25': {'available': false, byte: 0, bit: 4, 'name': 'O2S2_WR_lambda(1): Voltage', unit: 'V', value: 0},
-      '26': {'available': false, byte: 0, bit: 3, 'name': 'O2S3_WR_lambda(1): Voltage', unit: 'V', value: 0},
-      '27': {'available': false, byte: 0, bit: 2, 'name': 'O2S4_WR_lambda(1): Voltage', unit: 'V', value: 0},
-      '28': {'available': false, byte: 0, bit: 1, 'name': 'O2S5_WR_lambda(1): Voltage', unit: 'V', value: 0},
+      '24': {
+        'available': false,
+        byte: 0,
+        bit: 5,
+        'name': 'O2S1_WR_lambda(1): Voltage',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 8192;
+        }
+      },
+      '25': {
+        'available': false,
+        byte: 0,
+        bit: 4,
+        'name': 'O2S2_WR_lambda(1): Voltage',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 8192;
+        }
+      },
+      '26': {
+        'available': false,
+        byte: 0,
+        bit: 3,
+        'name': 'O2S3_WR_lambda(1): Voltage',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 8192;
+        }
+      },
+      '27': {
+        'available': false,
+        byte: 0,
+        bit: 2,
+        'name': 'O2S4_WR_lambda(1): Voltage',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 8192;
+        }
+      },
+      '28': {
+        'available': false,
+        byte: 0,
+        bit: 1,
+        'name': 'O2S5_WR_lambda(1): Voltage',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 8192;
+        }
+      },
 
-      '29': {'available': false, byte: 1, bit: 8, 'name': 'O2S6_WR_lambda(1): Voltage', unit: 'V', value: 0},
-      '2A': {'available': false, byte: 1, bit: 7, 'name': 'O2S7_WR_lambda(1): Voltage', unit: 'V', value: 0},
+      '29': {
+        'available': false,
+        byte: 1,
+        bit: 8,
+        'name': 'O2S6_WR_lambda(1): Voltage',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 8192;
+        }
+      },
+      '2A': {
+        'available': false,
+        byte: 1,
+        bit: 7,
+        'name': 'O2S7_WR_lambda(1): Voltage',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 8192;
+        }
+      },
       '2B': {'available': false, byte: 1, bit: 6, 'name': 'O2S8_WR_lambda(1): Voltage', unit: 'V', value: 0},
-      '2C': {'available': false, byte: 1, bit: 5, 'name': 'Commanded EGR', unit: '%', value: 0},
-      '2D': {'available': false, byte: 1, bit: 4, 'name': 'EGR Error', unit: '%', value: 0},
+      calc: function (data) {
+        return ((data[2] * 256) + data[3]) / 8192;
+      },
+      '2C': {
+        'available': false,
+        byte: 1,
+        bit: 5,
+        'name': 'Commanded EGR',
+        unit: '%',
+        value: 0,
+        calc: function (data) {
+          return data[0] * 100 / 255;
+        }
+      },
+      '2D': {
+        'available': false,
+        byte: 1,
+        bit: 4,
+        'name': 'EGR Error',
+        unit: '%',
+        value: 0,
+        calc: function (data) {
+          return (data[0] - 128) * 100 / 128;
+        }
+      },
       '2E': {'available': false, byte: 1, bit: 3, 'name': 'Commanded evaporative purge', unit: '%', value: 0},
       '2F': {'available': false, byte: 1, bit: 2, 'name': 'Fuel Level Input', unit: '%', value: 0},
       '30': {'available': false, byte: 1, bit: 1, 'name': 'number of warm-ups since codes cleared', unit: '', value: 0},
