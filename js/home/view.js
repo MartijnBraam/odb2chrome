@@ -13,6 +13,7 @@ angular.module('app.home', ['ngRoute'])
     $scope.serialPorts = [];
     $scope.serialPortsRefreshing = false;
     $scope.elm327 = elm327;
+    $scope.hideUnavailableSensors = true;
 
     $scope.refreshPorts = function(){
       $scope.serialPortsRefreshing = true;

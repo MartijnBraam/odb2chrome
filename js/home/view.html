@@ -33,14 +33,17 @@
 <div class="panel panel-paper">
     <div class="panel-heading">Sensor availability</div>
     <div class="panel-body">
+        <label>
+            <input type="checkbox" id="hidesensors" ng-model="hideUnavailableSensors"> Hide unavailable sensors
+        </label>
         <table class="table table-striped">
             <tr>
-                <th>Available</th>
                 <th>Name</th>
+                <th>Available</th>
             </tr>
-            <tr ng-repeat="pid in elm327.pids">
-                <td>{{ pid.available }}</td>
+            <tr ng-repeat="pid in elm327.pids" ng-hide="!pid.available && hideUnavailableSensors">
                 <td>{{ pid.name }}</td>
+                <td>{{ pid.available }}</td>
             </tr>
         </table>
     </div>
