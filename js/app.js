@@ -27,12 +27,14 @@ angular.module('app', [
     $scope.serialPortsRefreshing = false;
     $scope.elm327 = elm327;
     $scope.hideUnavailableSensors = true;
+    $scope.serialPort = {
+      baudrate: "38400",
+      port: ""
+    };
 
     $scope.refreshPorts = function () {
       $scope.serialPortsRefreshing = true;
       chrome.serial.getDevices(function (ports) {
-        ports.push({"port": "/dev/pts/7"});
-        console.log(ports);
         $scope.serialPorts = ports;
         $scope.serialPortsRefreshing = false;
         $scope.$apply();
@@ -41,7 +43,8 @@ angular.module('app', [
 
     $scope.refreshPorts();
     $scope.connect = function () {
-      $scope.elm327.config.port = "/dev/ttyUSB0";
+      $scope.elm327.config.port = $scope.serialPort.port;
+      $scope.elm327.config.baudrate = parseInt($scope.serialPort.baudrate, 10);
       elm327.connect();
     };
 
@@ -64,8 +67,8 @@ angular.module('app', [
     };
 
     $scope.pids = [];
-    $scope.bootstrapEnable = function(pid){
-      $scope.elm327._queue.push("01"+pid+"1\r");
+    $scope.bootstrapEnable = function (pid) {
+      $scope.elm327._queue.push("01" + pid + "1\r");
     };
     $scope.$watch("elm327.pids", function (newValue, oldValue) {
       console.log("WATCHED!");
