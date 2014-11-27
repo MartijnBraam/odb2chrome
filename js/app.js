@@ -43,7 +43,11 @@ angular.module('app', [
 
     $scope.refreshPorts();
     $scope.connect = function () {
-      $scope.elm327.config.port = $scope.serialPort.port;
+      if($scope.serialPort.port == ""){
+        $scope.elm327.config.port = "/dev/ttyUSB0";
+      }else {
+        $scope.elm327.config.port = $scope.serialPort.port;
+      }
       $scope.elm327.config.baudrate = parseInt($scope.serialPort.baudrate, 10);
       elm327.connect();
     };
