@@ -6484,6 +6484,11 @@ nav ul li a:hover {
   stroke: #FFF;
   stroke-width: 1;
 }
+.graph .background .axis-x,
+.graph .background .axis-y {
+  stroke: black;
+  stroke-width: 1px;
+}
 .graph .valueLabel {
   fill: #FFF;
 }
@@ -6493,6 +6498,11 @@ nav ul li a:hover {
 }
 .graph .wipercap {
   fill: #555;
+}
+.graph .graph-line {
+  stroke: #558b2f;
+  stroke-width: 1;
+  fill: none;
 }
 .panel-paper {
   background: white;
