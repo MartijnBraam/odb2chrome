@@ -22,11 +22,17 @@ angular.module('app.graph', [])
         var meterScale = d3.scale.linear().domain([scope.min, scope.max]).range([startAngle, endAngle]);
 
         background.selectAll(".meterdot")
-          .data(meterScale.ticks(10))
+          .data(meterScale.ticks(20))
           .enter()
           .append("svg:line")
           .attr("class", "meterdot")
-          .attr("x1", 137)
+          .attr("x1", function(d,i){
+            if(i % 2 == 0){
+              return 137;
+            }else{
+              return 142;
+            }
+          })
           .attr("y1", 75)
           .attr("x2", 145)
           .attr("y2", 75)
