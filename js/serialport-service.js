@@ -860,26 +860,130 @@ angular.module('app.serialport', [])
         bit: 8,
         'name': 'Distance traveled since codes cleared',
         unit: 'km',
-        value: 0
+        value: 0,
+        calc: function (data) {
+          return (data[0] * 256) + data[1];
+        }
       },
-      '32': {'available': false, byte: 2, bit: 7, 'name': 'Evap. System Vapor Pressure', unit: 'Pa', value: 0},
-      '33': {'available': false, byte: 2, bit: 6, 'name': 'Barometric pressure', unit: 'kPa', value: 0},
-      '34': {'available': false, byte: 2, bit: 5, 'name': 'O2S1_WR_lambda(1): Current', unit: 'mA', value: 0},
-      '35': {'available': false, byte: 2, bit: 4, 'name': 'O2S2_WR_lambda(1): Current', unit: 'mA', value: 0},
-      '36': {'available': false, byte: 2, bit: 3, 'name': 'O2S3_WR_lambda(1): Current', unit: 'mA', value: 0},
-      '37': {'available': false, byte: 2, bit: 2, 'name': 'O2S4_WR_lambda(1): Current', unit: 'mA', value: 0},
-      '38': {'available': false, byte: 2, bit: 1, 'name': 'O2S5_WR_lambda(1): Current', unit: 'mA', value: 0},
+      '32': {
+        'available': false,
+        byte: 2,
+        bit: 7,
+        'name': 'Evap. System Vapor Pressure',
+        unit: 'Pa',
+        value: 0,
+        nograph: true
+      },
+      '33': {
+        'available': false,
+        byte: 2,
+        bit: 6,
+        'name': 'Barometric pressure',
+        unit: 'kPa',
+        value: 0,
+        calc: function (data) {
+          return data[0];
+        }
+      },
+      '34': {
+        'available': false,
+        byte: 2,
+        bit: 5,
+        'name': 'O2S1_WR_lambda(1): Current',
+        unit: 'mA',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 256 - 128;
+        }
+      },
+      '35': {
+        'available': false,
+        byte: 2,
+        bit: 4,
+        'name': 'O2S2_WR_lambda(1): Current',
+        unit: 'mA',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 256 - 128;
+        }
+      },
+      '36': {
+        'available': false,
+        byte: 2,
+        bit: 3,
+        'name': 'O2S3_WR_lambda(1): Current',
+        unit: 'mA',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 256 - 128;
+        }
+      },
+      '37': {
+        'available': false,
+        byte: 2,
+        bit: 2,
+        'name': 'O2S4_WR_lambda(1): Current',
+        unit: 'mA',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 256 - 128;
+        }
+      },
+      '38': {
+        'available': false,
+        byte: 2,
+        bit: 1,
+        'name': 'O2S5_WR_lambda(1): Current',
+        unit: 'mA',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 256 - 128;
+        }
+      },
 
-      '39': {'available': false, byte: 3, bit: 8, 'name': 'O2S6_WR_lambda(1): Current', unit: 'mA', value: 0},
-      '3A': {'available': false, byte: 3, bit: 7, 'name': 'O2S7_WR_lambda(1): Current', unit: 'mA', value: 0},
-      '3B': {'available': false, byte: 3, bit: 6, 'name': 'O2S8_WR_lambda(1): Current', unit: 'mA', value: 0},
+      '39': {
+        'available': false,
+        byte: 3,
+        bit: 8,
+        'name': 'O2S6_WR_lambda(1): Current',
+        unit: 'mA',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 256 - 128;
+        }
+      },
+      '3A': {
+        'available': false,
+        byte: 3,
+        bit: 7,
+        'name': 'O2S7_WR_lambda(1): Current',
+        unit: 'mA',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 256 - 128;
+        }
+      },
+      '3B': {
+        'available': false,
+        byte: 3,
+        bit: 6,
+        'name': 'O2S8_WR_lambda(1): Current',
+        unit: 'mA',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 256 - 128;
+        }
+      },
       '3C': {
         'available': false,
         byte: 3,
         bit: 5,
         'name': 'Catalyst Temperature: Bank 1, Sensor 1',
         unit: '°C',
-        value: 0
+        value: 0,
+        calc: function (data) {
+          return ((data[0] * 256) + data[1]) / 10 - 40;
+        }
       },
       '3D': {
         'available': false,
@@ -887,7 +991,10 @@ angular.module('app.serialport', [])
         bit: 4,
         'name': 'Catalyst Temperature: Bank 2, Sensor 1',
         unit: '°C',
-        value: 0
+        value: 0,
+        calc: function (data) {
+          return ((data[0] * 256) + data[1]) / 10 - 40;
+        }
       },
       '3E': {
         'available': false,
@@ -895,7 +1002,10 @@ angular.module('app.serialport', [])
         bit: 3,
         'name': 'Catalyst Temperature: Bank 1, Sensor 2',
         unit: '°C',
-        value: 0
+        value: 0,
+        calc: function (data) {
+          return ((data[0] * 256) + data[1]) / 10 - 40;
+        }
       },
       '3F': {
         'available': false,
@@ -903,9 +1013,12 @@ angular.module('app.serialport', [])
         bit: 2,
         'name': 'Catalyst Temperature: Bank 2, Sensor 2',
         unit: '°C',
-        value: 0
+        value: 0,
+        calc: function (data) {
+          return ((data[0] * 256) + data[1]) / 10 - 40;
+        }
       },
-      '40': {'available': false, byte: 3, bit: 1, 'name': 'PIDs supported [21 - 40]', value: 0}
+      '40': {'available': false, byte: 3, bit: 1, 'name': 'PIDs supported [21 - 40]', value: 0, nograph: true}
     };
 
     this.dtcs = [];
