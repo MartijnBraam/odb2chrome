@@ -1,5 +1,5 @@
 {
-    "name": "odb2chrome",
+    "name": "Car diagnostics",
     "version": "1.0",
     "manifest_version": 2,
     "minimum_chrome_version": "23",
@@ -19,7 +19,6 @@
 
     "permissions": [
         "serial",
-        "storage",
-        "geolocation"
+        "storage"
     ]
 }
