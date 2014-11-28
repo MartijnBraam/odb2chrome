@@ -148,8 +148,8 @@ angular.module('app.serialport', [])
         } else {
           this.pids[pid].value = response.data;
         }
-        if(this.pids[pid].hasOwnProperty("enabled") && this.pids[pid].enabled){
-          this._queue.push("01"+pid+"1\r");
+        if (this.pids[pid].hasOwnProperty("enabled") && this.pids[pid].enabled) {
+          this._queue.push("01" + pid + "1\r");
         }
         $rootScope.$apply();
       },
@@ -338,9 +338,33 @@ angular.module('app.serialport', [])
 
     this.pids = {
       // Page 1
-      '01': {'available': false, byte: 0, bit: 8, 'name': 'Monitor status since DTCs cleared', unit: '', value: 0},
-      '02': {'available': false, byte: 0, bit: 7, 'name': 'Freeze DTC', unit: '', value: 0},
-      '03': {'available': false, byte: 0, bit: 6, 'name': 'Fuel system status', unit: '', value: 0},
+      '01': {
+        'available': false,
+        byte: 0,
+        bit: 8,
+        'name': 'Monitor status since DTCs cleared',
+        unit: '',
+        value: 0,
+        nograph: true
+      },
+      '02': {
+        'available': false,
+        byte: 0,
+        bit: 7,
+        'name': 'Freeze DTC',
+        unit: '',
+        value: 0,
+        nograph: true
+      },
+      '03': {
+        'available': false,
+        byte: 0,
+        bit: 6,
+        'name': 'Fuel system status',
+        unit: '',
+        value: 0,
+        nograph: true
+      },
       '04': {
         'available': false,
         byte: 0,
@@ -517,8 +541,24 @@ angular.module('app.serialport', [])
           return data[0] * 100 / 255;
         }
       },
-      '12': {'available': false, byte: 2, bit: 7, 'name': 'Commanded secondary air status', unit: '', value: 0},
-      '13': {'available': false, byte: 2, bit: 6, 'name': 'Oxygen sensors present', unit: '', value: 0},
+      '12': {
+        'available': false,
+        byte: 2,
+        bit: 7,
+        'name': 'Commanded secondary air status',
+        unit: '',
+        value: 0,
+        nograph: true
+      },
+      '13': {
+        'available': false,
+        byte: 2,
+        bit: 6,
+        'name': 'Oxygen sensors present',
+        unit: '',
+        value: 0,
+        nograph: true
+      },
       '14': {
         'available': false,
         byte: 2,
@@ -608,9 +648,33 @@ angular.module('app.serialport', [])
           return data[0] / 200;
         }
       },
-      '1C': {'available': false, byte: 3, bit: 5, 'name': 'OBD standards this vehicle conforms to', unit: '', value: 0},
-      '1D': {'available': false, byte: 3, bit: 4, 'name': 'Oxygen sensors present', unit: '', value: 0},
-      '1E': {'available': false, byte: 3, bit: 3, 'name': 'Auxiliary input status', unit: '', value: 0},
+      '1C': {
+        'available': false,
+        byte: 3,
+        bit: 5,
+        'name': 'OBD standards this vehicle conforms to',
+        unit: '',
+        value: 0,
+        nograph: true
+      },
+      '1D': {
+        'available': false,
+        byte: 3,
+        bit: 4,
+        'name': 'Oxygen sensors present',
+        unit: '',
+        value: 0,
+        nograph: true
+      },
+      '1E': {
+        'available': false,
+        byte: 3,
+        bit: 3,
+        'name': 'Auxiliary input status',
+        unit: '',
+        value: 0,
+        nograph: true
+      },
       '1F': {
         'available': false,
         byte: 3,
@@ -622,7 +686,15 @@ angular.module('app.serialport', [])
           return (data[0] * 256) + data[1];
         }
       },
-      '20': {'available': false, byte: 3, bit: 1, 'name': 'PIDs supported [21 - 40]', unit: '', value: 0},
+      '20': {
+        'available': false,
+        byte: 3,
+        bit: 1,
+        'name': 'PIDs supported [21 - 40]',
+        unit: '',
+        value: 0,
+        nograph: true
+      },
 
       // Page 2
       '21': {
@@ -736,10 +808,18 @@ angular.module('app.serialport', [])
           return ((data[2] * 256) + data[3]) / 8192;
         }
       },
-      '2B': {'available': false, byte: 1, bit: 6, 'name': 'O2S8_WR_lambda(1): Voltage', unit: 'V', value: 0},
-      calc: function (data) {
-        return ((data[2] * 256) + data[3]) / 8192;
+      '2B': {
+        'available': false,
+        byte: 1,
+        bit: 6,
+        'name': 'O2S8_WR_lambda(1): Voltage',
+        unit: 'V',
+        value: 0,
+        calc: function (data) {
+          return ((data[2] * 256) + data[3]) / 8192;
+        }
       },
+
       '2C': {
         'available': false,
         byte: 1,
@@ -764,7 +844,15 @@ angular.module('app.serialport', [])
       },
       '2E': {'available': false, byte: 1, bit: 3, 'name': 'Commanded evaporative purge', unit: '%', value: 0},
       '2F': {'available': false, byte: 1, bit: 2, 'name': 'Fuel Level Input', unit: '%', value: 0},
-      '30': {'available': false, byte: 1, bit: 1, 'name': 'number of warm-ups since codes cleared', unit: '', value: 0},
+      '30': {
+        'available': false,
+        byte: 1,
+        bit: 1,
+        'name': 'number of warm-ups since codes cleared',
+        unit: '',
+        value: 0,
+        nograph: true
+      },
 
       '31': {
         'available': false,
