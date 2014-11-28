@@ -42,14 +42,14 @@
         <table class="table table-striped">
             <tr>
                 <th>Name</th>
-                <th>Value</th>
-                <th>Unit</th>
-                <th>Available</th>
-                <th>Enabled</th>
+                <th width="20%">Value</th>
+                <th width="20%">Unit</th>
+                <th width="20">Available</th>
+                <th width="20">Enabled</th>
             </tr>
             <tr ng-repeat="(id, pid) in elm327.pids" ng-hide="!pid.available && hideUnavailableSensors">
                 <td>{{ pid.name }}</td>
-                <td>{{ pid.value }}</td>
+                <td>{{ pid.value | number }}</td>
                 <td>{{ pid.unit }}</td>
                 <td>{{ pid.available }}</td>
                 <td>
