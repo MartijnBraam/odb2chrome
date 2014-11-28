@@ -53,7 +53,7 @@
                 <td>{{ pid.unit }}</td>
                 <td>{{ pid.available }}</td>
                 <td>
-                    <input type="checkbox" ng-model="pid.enabled" ng-show="pid.available" ng-click="bootstrapEnable(id)">
+                    <input type="checkbox" ng-model="pid.enabled" ng-show="pid.available && !pid.nograph" ng-click="bootstrapEnable(id)">
                 </td>
             </tr>
         </table>
